@@ -44,7 +44,7 @@ This project demonstrates concepts of:
 - JScrollPane
 - ActionListener
 - Dynamic GUI Updates
-- 
+  
 📈 Future Enhancements:
 - Database integration using MySQL
 - User login system
