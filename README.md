@@ -1,6 +1,6 @@
 Online Survey System
 
-📌 Overview
+📌 Overview:
 The Online Survey System is a Java Swing-based desktop application that enables users to create, manage, and participate in surveys. The system supports dynamic question creation with multiple-choice options and provides an interactive graphical user interface.
 
 This project demonstrates concepts of:
