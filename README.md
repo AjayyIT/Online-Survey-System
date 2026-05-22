@@ -4,28 +4,28 @@ Online Survey System
 The Online Survey System is a Java Swing-based desktop application that enables users to create, manage, and participate in surveys. The system supports dynamic question creation with multiple-choice options and provides an interactive graphical user interface.
 
 This project demonstrates concepts of:
-• Java Swing GUI Development
-• Object-Oriented Programming
-• Event Handling
-• Dynamic Data Management
-• Survey and Question Management
+- Java Swing GUI Development
+- Object-Oriented Programming
+- Event Handling
+- Dynamic Data Management
+- Survey and Question Management
 
 🚀 Features:
-• Create surveys dynamically
-• Add multiple-choice questions
-• Add and manage options
-• Delete surveys
-• Participate in surveys
-• User-friendly graphical interface
-• Dynamic question rendering
-• Popup notifications using JOptionPane
+- Create surveys dynamically
+- Add multiple-choice questions
+- Add and manage options
+- Delete surveys
+- Participate in surveys
+- User-friendly graphical interface
+- Dynamic question rendering
+- Popup notifications using JOptionPane
 
 🛠 Technologies Used:
-• Java
-• Java Swing
-• AWT
-• OOP Concepts
-• Event Handling
+- Java
+- Java Swing
+- AWT
+- OOP Concepts
+- Event Handling
 
 ⚙️ How the System Works:
 1. User creates a survey.
@@ -35,24 +35,24 @@ This project demonstrates concepts of:
 5. Responses are submitted through the GUI interface.
 
 💻 Features Demonstrated:
-• Swing Components
-• JFrame
-• JPanel
-• JButton
-• JTextArea
-• JList
-• JScrollPane
-• ActionListener
-• Dynamic GUI Updates
-
+- Swing Components
+- JFrame
+- JPanel
+- JButton
+- JTextArea
+- JList
+- JScrollPane
+- ActionListener
+- Dynamic GUI Updates
+- 
 📈 Future Enhancements:
-• Database integration using MySQL
-• User login system
-• Store survey responses
-• Analytics dashboard
-• Export survey reports
-• Web-based version
-
+- Database integration using MySQL
+- User login system
+- Store survey responses
+- Analytics dashboard
+- Export survey reports
+- Web-based version
+  
 👨‍💻 Author:
 Ajay RS
 
