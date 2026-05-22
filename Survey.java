@@ -16,18 +16,17 @@ class Survey {
         questions.add(new Question(question, options));
     }
 
-    public void removeQuestion(int index) {
-        if (index >= 0 && index < questions.size()) {
-            questions.remove(index);
-        }
-    }
-
     public String getTitle() {
         return title;
     }
 
     public ArrayList<Question> getQuestions() {
         return questions;
+    }
+    
+    @Override
+    public String toString() {
+        return title; // Helps the JList display the title automatically
     }
 }
 
@@ -49,14 +48,19 @@ class Question {
     }
 }
 
-class SurveyManager extends Frame implements ActionListener {
+public class SurveyManager extends JFrame implements ActionListener {
     private ArrayList<Survey> surveys;
-    private List surveyList;
-    private TextField surveyTitleField;
-    private TextArea questionTextField;
-    private TextField optionField;
-    private List questionList;
-    private List optionList;
+    
+    // UI Components
+    private DefaultListModel<Survey> surveyListModel;
+    private JList<Survey> surveyList;
+    private JTextField surveyTitleField;
+    
+    private JTextArea questionTextField;
+    private JTextField optionField;
+    
+    private DefaultListModel<String> optionListModel;
+    private JList<String> optionList;
 
     public SurveyManager() {
         surveys = new ArrayList<>();
@@ -64,123 +68,165 @@ class SurveyManager extends Frame implements ActionListener {
     }
 
     private void setupGUI() {
-        setLayout(new FlowLayout());
+        setTitle("Survey Manager");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Fixes the "X" button issue
+        setLayout(new BorderLayout(10, 10));
 
-        Label surveyTitleLabel = new Label("Survey Title:");
-        add(surveyTitleLabel);
-
-        surveyTitleField = new TextField(20);
-        add(surveyTitleField);
-
-        Button createSurveyButton = new Button("Create Survey");
+        // --- TOP PANEL: Survey Creation ---
+        JPanel topPanel = new JPanel(new FlowLayout());
+        topPanel.add(new JLabel("Survey Title:"));
+        surveyTitleField = new JTextField(15);
+        topPanel.add(surveyTitleField);
+        
+        JButton createSurveyButton = new JButton("Create Survey");
         createSurveyButton.addActionListener(this);
-        add(createSurveyButton);
-
-        surveyList = new List();
-        add(surveyList);
-
-        Button deleteSurveyButton = new Button("Delete Survey");
+        topPanel.add(createSurveyButton);
+        
+        JButton deleteSurveyButton = new JButton("Delete Selected Survey");
         deleteSurveyButton.addActionListener(this);
-        add(deleteSurveyButton);
+        topPanel.add(deleteSurveyButton);
 
-        Label questionLabel = new Label("Question:");
-        add(questionLabel);
+        add(topPanel, BorderLayout.NORTH);
 
-        questionTextField = new TextArea(2, 20);
-        add(questionTextField);
+        // --- CENTER PANEL: Lists and Question Creation ---
+        JPanel centerPanel = new JPanel(new GridLayout(1, 2, 10, 10));
+        
+        // Left side: Survey List
+        surveyListModel = new DefaultListModel<>();
+        surveyList = new JList<>(surveyListModel);
+        centerPanel.add(new JScrollPane(surveyList));
 
-        Label optionLabel = new Label("Option:");
-        add(optionLabel);
-
-        optionField = new TextField(20);
-        add(optionField);
-
-        Button addOptionButton = new Button("Add Option");
+        // Right side: Question Builder
+        JPanel questionPanel = new JPanel();
+        questionPanel.setLayout(new BoxLayout(questionPanel, BoxLayout.Y_AXIS));
+        
+        questionPanel.add(new JLabel("Question:"));
+        questionTextField = new JTextArea(3, 20);
+        questionPanel.add(new JScrollPane(questionTextField));
+        
+        questionPanel.add(new JLabel("Option:"));
+        optionField = new JTextField(20);
+        questionPanel.add(optionField);
+        
+        JButton addOptionButton = new JButton("Add Option");
         addOptionButton.addActionListener(this);
-        add(addOptionButton);
-
-        optionList = new List();
-        add(optionList);
-
-        Button addQuestionButton = new Button("Add Question");
+        questionPanel.add(addOptionButton);
+        
+        optionListModel = new DefaultListModel<>();
+        optionList = new JList<>(optionListModel);
+        questionPanel.add(new JScrollPane(optionList));
+        
+        JButton addQuestionButton = new JButton("Add Question to Selected Survey");
         addQuestionButton.addActionListener(this);
-        add(addQuestionButton);
+        questionPanel.add(addQuestionButton);
 
-        questionList = new List();
-        add(questionList);
+        centerPanel.add(questionPanel);
+        add(centerPanel, BorderLayout.CENTER);
 
-        Button takeSurveyButton = new Button("Take Survey");
+        // --- BOTTOM PANEL: Actions ---
+        JPanel bottomPanel = new JPanel(new FlowLayout());
+        JButton takeSurveyButton = new JButton("Take Selected Survey");
         takeSurveyButton.addActionListener(this);
-        add(takeSurveyButton);
+        bottomPanel.add(takeSurveyButton);
+        
+        add(bottomPanel, BorderLayout.SOUTH);
 
-        setSize(400, 500);
+        setSize(700, 500);
+        setLocationRelativeTo(null); // Centers the window
         setVisible(true);
     }
 
     public void actionPerformed(ActionEvent ae) {
         String command = ae.getActionCommand();
-        String surveyTitle = surveyTitleField.getText();
-        Survey survey = getSurvey(surveyTitle);
+        Survey selectedSurvey = surveyList.getSelectedValue();
 
         if (command.equals("Create Survey")) {
-            surveys.add(new Survey(surveyTitle));
-            surveyList.add(surveyTitle);
-        } else if (command.equals("Delete Survey")) {
-            if (survey != null) {
-                surveys.remove(survey);
-                surveyList.remove(surveyTitle);
+            String title = surveyTitleField.getText().trim();
+            if (!title.isEmpty()) {
+                Survey newSurvey = new Survey(title);
+                surveys.add(newSurvey);
+                surveyListModel.addElement(newSurvey);
+                surveyTitleField.setText("");
             }
-        } else if (command.equals("Add Option")) {
-            String optionText = optionField.getText();
-            optionList.add(optionText);
-            optionField.setText("");
-        } else if (command.equals("Add Question")) {
-            if (survey != null) {
+        } 
+        else if (command.equals("Delete Selected Survey")) {
+            if (selectedSurvey != null) {
+                surveys.remove(selectedSurvey);
+                surveyListModel.removeElement(selectedSurvey);
+            }
+        } 
+        else if (command.equals("Add Option")) {
+            String optionText = optionField.getText().trim();
+            if (!optionText.isEmpty()) {
+                optionListModel.addElement(optionText);
+                optionField.setText("");
+            }
+        } 
+        else if (command.equals("Add Question to Selected Survey")) {
+            if (selectedSurvey != null && !questionTextField.getText().trim().isEmpty()) {
                 ArrayList<String> options = new ArrayList<>();
-                for (String option : optionList.getItems()) {
-                    options.add(option);
+                for (int i = 0; i < optionListModel.getSize(); i++) {
+                    options.add(optionListModel.getElementAt(i));
                 }
-                survey.addQuestion(questionTextField.getText(), options);
-                questionList.add(questionTextField.getText());
+                
+                selectedSurvey.addQuestion(questionTextField.getText(), options);
+                
+                // Clear fields after adding
                 questionTextField.setText("");
-                optionList.removeAll();
+                optionListModel.clear();
+                JOptionPane.showMessageDialog(this, "Question added successfully!");
+            } else {
+                JOptionPane.showMessageDialog(this, "Please select a survey and enter a question.");
             }
-        } else if (command.equals("Take Survey")) {
-            if (survey != null) {
-                takeSurvey(survey);
+        } 
+        else if (command.equals("Take Selected Survey")) {
+            if (selectedSurvey != null) {
+                if (selectedSurvey.getQuestions().isEmpty()) {
+                    JOptionPane.showMessageDialog(this, "This survey has no questions yet.");
+                } else {
+                    takeSurvey(selectedSurvey);
+                }
+            } else {
+                JOptionPane.showMessageDialog(this, "Please select a survey to take.");
             }
         }
-    }
-
-    private Survey getSurvey(String title) {
-        for (Survey survey : surveys) {
-            if (survey.getTitle().equals(title)) {
-                return survey;
-            }
-        }
-        return null;
     }
 
     private void takeSurvey(Survey survey) {
-        Frame surveyFrame = new Frame("Taking Survey: " + survey.getTitle());
-        surveyFrame.setLayout(new FlowLayout());
+        JFrame surveyFrame = new JFrame("Taking Survey: " + survey.getTitle());
+        surveyFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); // Only closes this window
+        
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         for (Question question : survey.getQuestions()) {
-            Label questionLabel = new Label(question.getQuestionText());
-            surveyFrame.add(questionLabel);
-
-            CheckboxGroup optionsGroup = new CheckboxGroup();
+            panel.add(new JLabel(question.getQuestionText()));
+            ButtonGroup optionsGroup = new ButtonGroup();
+            
             for (String option : question.getOptions()) {
-                Checkbox optionCheckbox = new Checkbox(option, optionsGroup, false);
-                surveyFrame.add(optionCheckbox);
+                JRadioButton optionRadio = new JRadioButton(option);
+                optionsGroup.add(optionRadio);
+                panel.add(optionRadio);
             }
+            panel.add(Box.createRigidArea(new Dimension(0, 15))); // Adds spacing
         }
+        
+        JButton submitButton = new JButton("Submit");
+        submitButton.addActionListener(e -> {
+            JOptionPane.showMessageDialog(surveyFrame, "Survey submitted!");
+            surveyFrame.dispose();
+        });
+        panel.add(submitButton);
 
+        surveyFrame.add(new JScrollPane(panel));
         surveyFrame.setSize(400, 500);
+        surveyFrame.setLocationRelativeTo(this);
         surveyFrame.setVisible(true);
     }
 
     public static void main(String[] args) {
-        new SurveyManager();
+        // Run GUI on the Event Dispatch Thread (Best practice for Swing)
+        SwingUtilities.invokeLater(() -> new SurveyManager());
     }
 }
